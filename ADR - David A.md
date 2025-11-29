@@ -30,7 +30,7 @@ We need to select the foundational Architectural Style that provides the best ba
 
 * Microservices Architecture (Distributed)
 
-* Three-Tier Architecture (Included as it is a common refinement of Layered)
+* Three-Tier Architecture
 
 ## Decision Outcome
 
@@ -75,8 +75,6 @@ A distributed style where the system is split into small, independent, deployabl
 * Bad, because it dramatically increases complexity due to the need for inter-service communication, distributed tracing, and data consistency management.
 
 * Bad, because it increases the time and cost required for the initial development phase, potentially undermining the funding objective.
-
-## More Information
 
 ### Three-Tier Architecture
 A refinement of Layered architecture that explicitly separates the Presentation Tier, Application (Business Logic) Tier, and Data Tier, often deployed on separate machines.
