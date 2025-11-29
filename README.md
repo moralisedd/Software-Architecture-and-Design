@@ -1,2 +1,7 @@
-# Software Architecture Records
-This where i record all of my decisions relating to software architecture
+# Project Title: Complaint Management System (CMS) for ABC Limited.
+
+## Architectural Style: Monolithic Layered Architecture
+
+## Technology Stack: 
+
+# Getting Started: Clear instructions on how to run the POC
