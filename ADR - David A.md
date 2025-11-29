@@ -1,74 +1,86 @@
 ---
-# These are optional metadata elements. Feel free to remove any of them.
-status: "{proposed | rejected | accepted | deprecated | … | superseded by ADR-0123"
-date: {YYYY-MM-DD when the decision was last updated}
-decision-makers: {list everyone involved in the decision}
-consulted: {list everyone whose opinions are sought (typically subject-matter experts); and with whom there is a two-way communication}
-informed: {list everyone who is kept up-to-date on progress; and with whom there is a one-way communication}
+status: {Accepted}
+date: {2025-11-29}
+decision-makers: {Chief, Architect & Leader Develop - David A.}
+consulted: {System Administrator, Help Desk Manager, Security Specialist}
+informed: {All Project Stakeholders}
 ---
 
-# {short title, representative of solved problem and found solution}
+# ADR-001: Adoption of Monolithic Layered Architecture
 
 ## Context and Problem Statement
 
-{Describe the context and problem statement, e.g., in free form using two to three sentences or in the form of an illustrative story. You may want to articulate the problem in form of a question and add links to collaboration boards or issue management systems.}
+We are designing a Complaint Management System (CMS) for ABC Limited, targeting large Banking and Telecom clients. The system must handle high volume (20 million customers, 10% yearly growth) and enforce strict multi-tenancy to ensure data isolation between corporate clients (e.g., NatWest and Barclays data must be separate).
 
-<!-- This is an optional element. Feel free to remove. -->
+We need to select the foundational Architectural Style that provides the best balance of structure, maintainability, and scalability to meet these Non-Functional Requirements (NFRs) while facilitating a focused initial development effort.
+
 ## Decision Drivers
 
-* {decision driver 1, e.g., a force, facing concern, …}
-* {decision driver 2, e.g., a force, facing concern, …}
-* … <!-- numbers of drivers can vary -->
+* (Maintainability & Separation of Concerns:) The architecture must enforce clean boundaries between the UI, business logic, and data, as recommended for layered architectures.
+
+* (Time-to-Market & Complexity:) We must select an approach that minimizes operational overhead and speeds up the initial development phase, aligning with the objective of "getting funding from venture capitalists with the outcome".
+
+* (Transactional Integrity:) The core function of "registering a problem" requires strong ACID (Atomicity, Consistency, Isolation, Durability) guarantees, favoring a single data store approach initially.
+
+* (Deployment Simplicity:) A single, unified deployment unit is preferred to the complexity of managing multiple services in a distributed environment at this stage.
 
 ## Considered Options
 
-* {title of option 1}
-* {title of option 2}
-* {title of option 3}
-* … <!-- numbers of options can vary -->
+* Monolithic Layered Architecture
+
+* Microservices Architecture (Distributed)
+
+* Three-Tier Architecture (Included as it is a common refinement of Layered)
 
 ## Decision Outcome
 
-Chosen option: "{title of option 1}", because {justification. e.g., only option, which meets k.o. criterion decision driver | which resolves force {force} | … | comes out best (see below)}.
+Chosen option: ("Monolithic Layered Architecture") (specifically, a Three-Tier refinement), because it provides the best trade-off for the initial phase of the CMS project. It offers a clear, well-understood structure that facilitates maintainability and clear separation of concerns, which is ("excellent for separation of concerns and maintainability").
 
-<!-- This is an optional element. Feel free to remove. -->
+While a (Microservices) approach offers superior long-term scalability, the complexity of managing distributed transactions and deployment overhead is a significant risk that could delay time-to-market. The (Layered Monolith) allows us to build the core transactional system efficiently while deferring the decision to refactor into Microservices until performance scaling demands it.
+
 ### Consequences
 
-* Good, because {positive consequence, e.g., improvement of one or more desired qualities, …}
-* Bad, because {negative consequence, e.g., compromising one or more desired qualities, …}
-* … <!-- numbers of consequences can vary -->
+* Good: Strong separation of concerns ensures that business logic (e.g., resolving complex problems) is isolated from the UI layer.
 
-<!-- This is an optional element. Feel free to remove. -->
+* Good: Simplifies development, testing, and deployment efforts (a single artifact).
+
+* Bad: Scaling is "all-or-nothing"—the entire application must be scaled to handle the high user load, which could become inefficient at extreme volumes.
+
+* Neutral: Performance may suffer from "performance overhead (too many layers)" if data access is poorly managed.
+
 ### Confirmation
 
-{Describe how the implementation of/compliance with the ADR can/will be confirmed. Are the design that was decided for and its implementation in line with the decision made? E.g., a design/code review or a test with a library such as ArchUnit can help validate this. Not that although we classify this element as optional, it is included in many ADRs.}
+Compliance will be confirmed during the Proof of Concept (PoC). The code base must be structured with explicit packages/modules for the Presentation, Business Logic, and Data Access layers. Code reviews will ensure that there are no "back-door" calls that bypass the Business Logic layer.
 
-<!-- This is an optional element. Feel free to remove. -->
 ## Pros and Cons of the Options
 
-### {title of option 1}
+### Monolithic Layered Architecture
 
-<!-- This is an optional element. Feel free to remove. -->
-{example | description | pointer to more information | …}
+A well-known structure where components are organized into horizontal, sequential layers (Presentation -> Business Logic -> Data Access).
 
-* Good, because {argument a}
-* Good, because {argument b}
-<!-- use "neutral" if the given argument weights neither for good nor bad -->
-* Neutral, because {argument c}
-* Bad, because {argument d}
-* … <!-- numbers of pros and cons can vary -->
+* Good, because it enforces modularity and strong separation, which aids in long-term maintainability.
 
-### {title of other option}
+* Good, because it is less complex to develop and test than distributed systems.
 
-{example | description | pointer to more information | …}
+* Good, because changes to the UI layer (e.g., compliance with WCAG 2) can be made without impacting core business logic.
 
-* Good, because {argument a}
-* Good, because {argument b}
-* Neutral, because {argument c}
-* Bad, because {argument d}
-* …
+* Bad, because the entire system is tightly coupled; a failure in one area can bring down the entire application (affecting 24/7 Availability).
 
-<!-- This is an optional element. Feel free to remove. -->
+### Microservices Architecture
+
+A distributed style where the system is split into small, independent, deployable services.
+
+* Good, because it provides superior Scalability and Availability by allowing individual components to be scaled and deployed independently.
+
+* Bad, because it dramatically increases complexity due to the need for inter-service communication, distributed tracing, and data consistency management.
+
+* Bad, because it increases the time and cost required for the initial development phase, potentially undermining the funding objective.
+
 ## More Information
 
-{You might want to provide additional evidence/confidence for the decision outcome here and/or document the team agreement on the decision and/or define when/how this decision the decision should be realized and if/when it should be re-visited. Links to other decisions and resources might appear here as well.}
+### Three-Tier Architecture
+A refinement of Layered architecture that explicitly separates the Presentation Tier, Application (Business Logic) Tier, and Data Tier, often deployed on separate machines.
+
+* Good, because it offers better distribution of resources than a simple two-tier monolith, providing a middle ground for managing the "20 million customers" scale.
+
+* Neutral, because it still uses a single code base (the Application Tier), retaining the simplicity and coupling risks of a monolith.
